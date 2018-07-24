@@ -1,0 +1,19 @@
+spring.mail.host: smtp.gmail.com
+spring.mail.port: 587
+spring.mail.username : doyeong1209@gmail.com
+spring.mail.password : yhj13098*
+spring.mail.properties.mail.smtp.auth: true
+spring.mail.properties.mail.smtp.starttls.enable : true
+
+spring.mail.scheduler.priorityLevels: 10
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/clues
+    username: root
+    password: yhj13098
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database: MYSQL
