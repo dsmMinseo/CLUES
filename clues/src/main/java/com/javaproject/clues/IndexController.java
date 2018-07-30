@@ -22,33 +22,17 @@ public class IndexController {
     @PostMapping("/mail")
     public String mail(@RequestParam String email) {
         EmailServicelmpl emailService = new EmailServicelmpl();
-        StringBuffer temp_secutiryNum = new StringBuffer();
-        Random random = new Random();
-        for(int i = 0; i < 5; i++) {
-            int num = random.nextInt(2);
-            switch (num) {
-                case 0:
-                    temp_secutiryNum.append((char) (random.nextInt(26) + 65 ));
-                    break;
-                case 1:
-                    temp_secutiryNum.append(random.nextInt(10));
-                    break;
-            }
-        }
-        String securityNum = temp_secutiryNum.toString();
-        emailService.sendSimpleMessage(javaMailSender, email, securityNum);
-        return securityNum;
+        return emailService.sendSimpleMessage(javaMailSender, email);
     }
 
     @PostMapping("/signup")
-    public String signup(User user) {
+    public boolean signup(User user) {
         Encoder encoder = java.util.Base64.getEncoder();
         String serial_string = user.getUser_id() +user.getUser_password();
         String serial = encoder.encodeToString(serial_string.getBytes());
-        //serial.substring(0,32);
         user.setUser_serial(serial);
         userRepository.save(user);
-        return serial;
+        return true;
     }
 
     @PostMapping("/overlap")
@@ -57,6 +41,67 @@ public class IndexController {
         if(users.size() > 0) {
             return false;
         } else {
+            return true;
+        }
+    }
+
+    @PostMapping("/findid")
+    public String findid(@RequestParam String user_name, @RequestParam String user_email) {
+        List<User> users = userRepository.findId(user_name, user_email);
+        if(users.size() == 0) {
+            return "error";
+        } else {
+            User user = users.get(0);
+            String id = user.getUser_id();
+            StringBuilder b_id = new StringBuilder(id);
+            Random random = new Random();
+            int num = random.nextInt(id.length()-1);
+            b_id.setCharAt(num, '*');
+            b_id.setCharAt(num+1, '*');
+            id = b_id.toString();
+            return id;
+        }
+    }
+
+    @PostMapping("/pwemail")
+    public String pwemail(@RequestParam String user_id, @RequestParam String user_email) {
+        List<User> users = userRepository.checkid(user_id, user_email);
+        if(users.size() == 0) {
+            return "error";
+        } else {
+            EmailServicelmpl emailServicelmpl = new EmailServicelmpl();
+            return emailServicelmpl.sendSimpleMessage(javaMailSender, user_email);
+        }
+    }
+
+    @PostMapping("/setpw")
+    public void setpw(@RequestParam String newpw, @RequestParam String user_id) {
+        userRepository.changePw(newpw, user_id);
+    }
+
+    @PostMapping("/signin")
+    public String signin(@RequestParam String user_id, @RequestParam String user_password) {
+        List<User> users = userRepository.signin(user_id);
+        if(users.size() == 0) {
+            return "wrong id";
+        } else {
+            User user = users.get(0);
+            System.out.println(user.getUser_password());
+            if(user.getUser_password().equals(user_password)) {
+                return user.getUser_serial();
+            } else {
+                return "wrong pw";
+            }
+        }
+    }
+
+    @PostMapping("/setnick")
+    public boolean setnick(@RequestParam String user_nick, @RequestParam String user_serial) {
+        List<User> users = userRepository.checknick(user_nick);
+        if(users.size()>0) {
+            return false;
+        } else {
+            userRepository.setnick(user_nick, user_serial);
             return true;
         }
     }

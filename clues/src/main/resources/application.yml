@@ -9,7 +9,7 @@ spring.mail.scheduler.priorityLevels: 10
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/clues
+    url: jdbc:mysql://localhost:3306/clues?useSSL=false
     username: root
     password: yhj13098
   jpa:
